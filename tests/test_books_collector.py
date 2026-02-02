@@ -55,15 +55,13 @@ class TestBooksCollector:
         collector.add_new_book("Война и мир")
         collector.set_book_genre("Неизвестная книга", "Фантастика")
 
-        # У существующей книги жанр должен остаться пустым
         assert collector.get_book_genre("Война и мир") == ""
-        # Несуществующая книга не должна появиться
         assert collector.get_book_genre("Неизвестная книга") is None
 
     # Проверяем: если жанр не входит в список допустимых, жанр не устанавливается
     def test_set_book_genre_does_not_set_genre_for_invalid_genre(self, collector):
         collector.add_new_book("Война и мир")
-        collector.set_book_genre("Война и мир", "Роман")  # жанра нет в списке genre
+        collector.set_book_genre("Война и мир", "Роман")
         assert collector.get_book_genre("Война и мир") == ""
 
     # ---------- Тесты для get_books_with_specific_genre и get_books_genre ----------
@@ -93,7 +91,7 @@ class TestBooksCollector:
         collector.add_new_book("Конёк-Горбунок")
 
         collector.set_book_genre("Мастер и Маргарита", "Фантастика")
-        collector.set_book_genre("Преступление и наказание", "Детективы")  # возрастной рейтинг
+        collector.set_book_genre("Преступление и наказание", "Детективы")
         collector.set_book_genre("Конёк-Горбунок", "Мультфильмы")
 
         result = collector.get_books_for_children()
@@ -103,6 +101,12 @@ class TestBooksCollector:
 
     # ---------- Тесты для работы с избранным ----------
 
+    # ❗ ВАЖНО: отдельный тест — нельзя добавить в избранное книгу,
+    # которая не была добавлена в коллекцию
+    def test_add_book_in_favorites_does_not_add_book_not_in_collection(self, collector):
+        collector.add_book_in_favorites("Война и мир")
+        assert collector.get_list_of_favorites_books() == []
+
     # Проверяем, что в избранное можно добавить только книгу из словаря books_genre
     def test_add_book_in_favorites_adds_only_if_book_exists_in_books_genre(self, collector):
         collector.add_book_in_favorites("Война и мир")
@@ -110,7 +114,6 @@ class TestBooksCollector:
 
         collector.add_new_book("Война и мир")
         collector.add_book_in_favorites("Война и мир")
-
         assert collector.get_list_of_favorites_books() == ["Война и мир"]
 
     # Проверяем, что одну и ту же книгу нельзя добавить в избранное дважды
@@ -118,7 +121,6 @@ class TestBooksCollector:
         collector.add_new_book("Война и мир")
         collector.add_book_in_favorites("Война и мир")
         collector.add_book_in_favorites("Война и мир")
-
         assert collector.get_list_of_favorites_books() == ["Война и мир"]
 
     # Проверяем, что книга удаляется из избранного
@@ -126,5 +128,4 @@ class TestBooksCollector:
         collector.add_new_book("Война и мир")
         collector.add_book_in_favorites("Война и мир")
         collector.delete_book_from_favorites("Война и мир")
-
         assert collector.get_list_of_favorites_books() == []
